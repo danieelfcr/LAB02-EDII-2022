@@ -8,16 +8,57 @@ namespace LAB02_EDII
 {
     class HuffmanNode
     {
-        public int Data { get; set; }
-        public string S { get; set; }
+        public char Symbol { get; set; }
+        public int Frequency { get; set; }
+        public HuffmanNode Right { get; set; }
+        public HuffmanNode Left { get; set; }
 
-        public HuffmanNode Left;
-        public HuffmanNode Right;
-
-        public HuffmanNode(int Data, string S)
+        public List<bool> Traverse(char symbol, List<bool> data)
         {
-            this.Data = Data;
-            this.S = S;
+            // Leaf
+            if (Right == null && Left == null)
+            {
+                if (symbol.Equals(this.Symbol))
+                {
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                List<bool> left = null;
+                List<bool> right = null;
+
+                if (Left != null)
+                {
+                    List<bool> leftPath = new List<bool>();
+                    leftPath.AddRange(data);
+                    leftPath.Add(false);
+
+                    left = Left.Traverse(symbol, leftPath);
+                }
+
+                if (Right != null)
+                {
+                    List<bool> rightPath = new List<bool>();
+                    rightPath.AddRange(data);
+                    rightPath.Add(true);
+                    right = Right.Traverse(symbol, rightPath);
+                }
+
+                if (left != null)
+                {
+                    return left;
+                }
+                else
+                {
+                    return right;
+                }
+            }
+
         }
     }
 }

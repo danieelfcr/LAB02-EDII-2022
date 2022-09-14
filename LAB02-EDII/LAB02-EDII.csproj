@@ -57,8 +57,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="HuffmanCode.cs" />
     <Compile Include="HuffmanNode.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="HuffmanNode1.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

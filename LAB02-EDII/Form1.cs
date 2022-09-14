@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace LAB02_EDII
 {
@@ -18,7 +19,8 @@ namespace LAB02_EDII
         {
             InitializeComponent();
         }
-
+        
+        Dictionary<string, List<string>> GlobalCodes = new Dictionary<string, List<string>>();
         private void btnImport_Click(object sender, EventArgs e)
         {
             string[] Data = new string[2];
@@ -35,6 +37,7 @@ namespace LAB02_EDII
                 tBSource.Text = file;
                 btnImport.Enabled = false;
                 gBBuscar.Enabled = true;
+                gBDecodificar.Enabled = true;
             }
             else
             {
@@ -87,7 +90,7 @@ namespace LAB02_EDII
         //Inserts a person to tree
         public static void InsertData(Person person)
         {
-            Node<Person> NewNodeDPI = new Node<Person>(person);
+            HuffmanNode<Person> NewNodeDPI = new HuffmanNode<Person>(person);
 
             if (!Data.Instance.DPITree.Contains(Data.Instance.DPITree.Root, NewNodeDPI))
             {
@@ -112,7 +115,7 @@ namespace LAB02_EDII
                 address = person.address
             };
 
-            Node<Person> PatchNodeDPI = new Node<Person>(auxPerson);
+            HuffmanNode<Person> PatchNodeDPI = new HuffmanNode<Person>(auxPerson);
 
             Data.Instance.DPITree.EditData(Data.Instance.DPITree.Root, PatchNodeDPI);
 
@@ -126,7 +129,7 @@ namespace LAB02_EDII
                 name = person.name,
                 dpi = person.dpi,
             };
-            Node<Person> DeleteNodeDPI = new Node<Person>(auxPerson);
+            HuffmanNode<Person> DeleteNodeDPI = new HuffmanNode<Person>(auxPerson);
 
             Data.Instance.DPITree.Delete(Data.Instance.DPITree.Root, DeleteNodeDPI);
 
@@ -136,7 +139,111 @@ namespace LAB02_EDII
         {
             if (mTBBuscarDPI.Text.Length == 13)
             {
+                //Create new person object
+                Person person = new Person
+                {
+                    dpi = Convert.ToInt64(mTBBuscarDPI.Text)
+                };
+                HuffmanNode<Person> auxPerson = new HuffmanNode<Person>(person);
 
+                //Search person
+                HuffmanNode<Person> Person = Data.Instance.DPITree.Search(Data.Instance.DPITree.Root, auxPerson);
+                if (Person.Record != auxPerson.Record)
+                {
+                    MessageBox.Show("Búsqueda exitosa.");
+
+                    //Exportar txt con los datos de persona
+                    string data = "Name: " + Person.Record.name + "\nDateBirth: " + Convert.ToString(Person.Record.datebirth)+ "\n Companies: ";
+                    foreach (string company in Person.Record.companies)
+                    {
+                        data += "\n   " + company;
+                    }
+                    
+                    System.IO.File.WriteAllText("Person_Data.txt", data);
+
+                    
+
+                }
+                else
+                {
+                    MessageBox.Show("No existe registro de la persona en la estrucutra de datos.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Ingresa un DPI válido.");
+            }
+        }
+
+        private void btnDecod_Click(object sender, EventArgs e)
+        {
+            if (mTBBuscarDPI.Text.Length == 13)
+            {
+                //Create new person object
+                Person person = new Person
+                {
+                    dpi = Convert.ToInt64(mTBBuscarDPI.Text)
+                };
+                HuffmanNode<Person> auxPerson = new HuffmanNode<Person>(person);
+
+                //Search person
+                HuffmanNode<Person> Person = Data.Instance.DPITree.Search(Data.Instance.DPITree.Root, auxPerson);
+                if (Person.Record != auxPerson.Record)
+                {
+                    MessageBox.Show("Se ha encontrado a la persona. Realizando codificación y decodificación...");
+                    foreach (string company in Person.Record.companies)
+                    {
+                        if (!Person.Record.Keys.ContainsKey(company))
+                        {
+                            string normal = company + Convert.ToString(Person.Record.dpi);
+                            Person.Record.Keys.Add(company, company + Convert.ToString(Person.Record.dpi));
+
+                            HuffmanCode huffmancode = new HuffmanCode();
+                            huffmancode.Build(normal);
+
+
+                            // Encode
+                            BitArray encoded = huffmancode.Encode(normal);
+                            Person.Record.HuffmanBitArray.Add(company, encoded); //Add to person's dictionary
+                            string encod = ""; //To save codification
+
+                            foreach (bool bit in encoded)
+                            {
+                                encod += ((bit ? 1 : 0) + "");
+                            }
+
+                            Person.Record.CodedKeys.Add(company, encod);
+
+                            //Decode
+                            Person.Record.DecodedKeys.Add(company, huffmancode.Decode(encoded));
+                            
+                        }
+                    }
+
+                    //Exportar txt con los datos de persona
+                    string data = "Name: " + Person.Record.name + "\nDPI: " + Person.Record.dpi + "\nDateBirth: " + Convert.ToString(Person.Record.datebirth) + "\n Companies: ";
+                    foreach (string company in Person.Record.companies)
+                    {
+                        data += "\n   " + company;
+                    }
+                    data += "\n\nCoded keys: ";
+                    foreach (var item in Person.Record.CodedKeys)
+                    {
+                        data += "\n   " + Convert.ToString(item);
+                    }
+                    data += "\n\nProof of decodification: ";
+                    foreach (var item in Person.Record.DecodedKeys)
+                    {
+                        data += "\n   " + Convert.ToString(item);
+                    }
+                    System.IO.File.WriteAllText("Person_SensibleData.txt", data);
+
+
+                }
+                else
+                {
+                    MessageBox.Show("No existe registro de la persona en la estrucutra de datos.");
+                }
             }
             else
             {

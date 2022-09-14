@@ -8,7 +8,7 @@ namespace LAB02_EDII
 {
     class AVL<T>
     {
-        public Node<T> Root;
+        public HuffmanNode<T> Root;
         public int count;
         public List<T> NodeList;
         Func<T, T, int> Comparer;
@@ -39,7 +39,7 @@ namespace LAB02_EDII
 
 
 
-        public Node<T> Insert(Node<T> root, Node<T> newNode)
+        public HuffmanNode<T> Insert(HuffmanNode<T> root, HuffmanNode<T> newNode)
         {
             //Base case
             if (root == null)
@@ -83,7 +83,7 @@ namespace LAB02_EDII
             return root;
         }
 
-        public int GetHeight(Node<T> node)
+        public int GetHeight(HuffmanNode<T> node)
         {
             if (node == null)
                 return -1;
@@ -96,7 +96,7 @@ namespace LAB02_EDII
             return (leftHeight > rightHeight) ? leftHeight + 1 : rightHeight + 1;
         }
 
-        public int CalculateBalanceFactor(Node<T> node)
+        public int CalculateBalanceFactor(HuffmanNode<T> node)
         {
             if (node == null)
                 return -1;
@@ -104,27 +104,27 @@ namespace LAB02_EDII
         }
 
 
-        public Node<T> RightRotation(Node<T> node)
+        public HuffmanNode<T> RightRotation(HuffmanNode<T> node)
         {
-            Node<T> newRoot = node.Left;
-            Node<T> rightAux = newRoot.Right;
+            HuffmanNode<T> newRoot = node.Left;
+            HuffmanNode<T> rightAux = newRoot.Right;
             newRoot.Right = node;
             node.Left = rightAux;
 
             return newRoot;
         }
 
-        public Node<T> LeftRotation(Node<T> node)
+        public HuffmanNode<T> LeftRotation(HuffmanNode<T> node)
         {
-            Node<T> newRoot = node.Right;
-            Node<T> leftAux = newRoot.Left;
+            HuffmanNode<T> newRoot = node.Right;
+            HuffmanNode<T> leftAux = newRoot.Left;
             newRoot.Left = node;
             node.Right = leftAux;
 
             return newRoot;
         }
 
-        public void SearchInOrder(Node<T> root, Node<T> node)
+        public void SearchInOrder(HuffmanNode<T> root, HuffmanNode<T> node)
         {
             if (root == null) return;
 
@@ -138,7 +138,7 @@ namespace LAB02_EDII
         }
 
 
-        public bool Contains(Node<T> root, Node<T> newNode)
+        public bool Contains(HuffmanNode<T> root, HuffmanNode<T> newNode)
         {
             if (root != null)
             {
@@ -160,7 +160,29 @@ namespace LAB02_EDII
             return false;
         }
 
-        public void EditData(Node<T> root, Node<T> nodeToEdit)
+        public HuffmanNode<T> Search(HuffmanNode<T> root, HuffmanNode<T> newNode)
+        {
+            if (root != null)
+            {
+                if (Comparer(root.Record, newNode.Record) == 0) //Evaluate if they are the same
+                {
+                    return root;
+                }
+                else if ((Comparer(root.Record, newNode.Record) == 1) && (Root.Left != null))   //Evaluate if it is smaller
+                {
+                    //If it is, go left
+                    return Search(root.Left, newNode);
+                }
+                else if ((Comparer(root.Record, newNode.Record) == -1) && (Root.Right != null))
+                {
+                    //If it isn't, go right
+                    return Search(root.Right, newNode);
+                }
+            }
+            return newNode;
+        }
+
+        public void EditData(HuffmanNode<T> root, HuffmanNode<T> nodeToEdit)
         {
             if (root != null)
             {
@@ -181,7 +203,7 @@ namespace LAB02_EDII
             }
         }
 
-        public Node<T> Delete(Node<T> root, Node<T> DeleteNode)
+        public HuffmanNode<T> Delete(HuffmanNode<T> root, HuffmanNode<T> DeleteNode)
         {
             if (root == null)
                 return root;
@@ -200,7 +222,7 @@ namespace LAB02_EDII
             {
                 if (root.Left == null || root.Right == null)
                 {
-                    Node<T> aux = (root.Left != null) ? root.Left : root.Right;
+                    HuffmanNode<T> aux = (root.Left != null) ? root.Left : root.Right;
 
                     if (aux == null)
                     {
@@ -216,7 +238,7 @@ namespace LAB02_EDII
                 }
                 else
                 {
-                    Node<T> aux = minValueNode(root.Right);
+                    HuffmanNode<T> aux = minValueNode(root.Right);
                     root.Record = aux.Record;
                     root.Right = Delete(root.Right, DeleteNode);
                 }
@@ -261,9 +283,9 @@ namespace LAB02_EDII
 
         }
 
-        Node<T> minValueNode(Node<T> node)
+        HuffmanNode<T> minValueNode(HuffmanNode<T> node)
         {
-            Node<T> aux = node;
+            HuffmanNode<T> aux = node;
             if (node.Left != null)
             {
                 aux = aux.Left;
